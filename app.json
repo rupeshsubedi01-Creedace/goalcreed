@@ -18,7 +18,7 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png"
       },
-      "package": "com.anonymous.goalcreed"
+      "package": "com.creedace.goalcreed"
     },
     "web": {
       "output": "static",
@@ -39,6 +39,7 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "description": "Live football — precise timing, real-time scoreboards, stats & goal timelines."
+    "description": "Live football — precise timing, real-time scoreboards, stats & goal timelines.",
+    "runtimeVersion": "1.0.0"
   }
 }

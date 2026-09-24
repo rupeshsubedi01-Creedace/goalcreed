@@ -45,3 +45,7 @@ example
 # local test artifacts
 .tmp-tests/
 dist-web/
+
+# local build byproducts
+*.apk
+build.log
