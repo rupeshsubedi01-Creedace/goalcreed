@@ -7,7 +7,8 @@ SDK=$TOOLS/android-sdk
 mkdir -p "$TOOLS" "$SDK"
 
 echo "== [1/5] JDK 17 (Temurin) =="
-if [ ! -d "$TOOLS/jdk-17" ]; then
+if [ ! -x "$TOOLS/jdk-17/bin/java" ] || ! "$TOOLS/jdk-17/bin/java" -version >/dev/null 2>&1; then
+  rm -rf "$TOOLS/jdk-17" "$TOOLS/jdk-17-tmp"
   url="https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse"
   curl -fL --retry 3 -o "$TOOLS/jdk17.tar.gz" "$url"
   mkdir -p "$TOOLS/jdk-17-tmp"
@@ -21,6 +22,7 @@ java -version 2>&1 | head -1
 
 echo "== [2/5] Android cmdline-tools =="
 if [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
+  rm -rf "$SDK/cmdline-tools/latest"
   curl -fL --retry 3 -o "$TOOLS/cmdtools.zip" \
     https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
   mkdir -p "$SDK/cmdline-tools"
@@ -34,8 +36,11 @@ echo "== [3/5] licenses =="
 yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$SDK" --licenses >/dev/null 2>&1 || true
 
 echo "== [4/5] packages (platform 36 · build-tools · NDK) =="
+NDK=27.1.12297006
+if [ ! -f "$SDK/ndk/$NDK/source.properties" ]; then rm -rf "$SDK/ndk/$NDK"; fi
 "$SDK/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$SDK" \
-  "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006" "cmake;3.22.1" "platform-tools"
+  "platforms;android-36" "build-tools;36.0.0" "ndk;$NDK" "cmake;3.22.1" "platform-tools"
+test -f "$SDK/ndk/$NDK/source.properties" || { echo "NDK incomplete"; exit 1; }
 
 echo "== [5/5] project local.properties =="
 echo "sdk.dir=$SDK" > /home/user/goalcreed/android/local.properties
