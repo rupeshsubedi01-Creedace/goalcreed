@@ -13,6 +13,7 @@ import {
   normalizeStats,
   parseStatValue,
   shortTeamName,
+  toUiLineups,
 } from '@/api/normalize';
 import type { Fixture, MatchEvent, TeamStatistics } from '@/api/types';
 
@@ -283,6 +284,76 @@ suite('season helper for sportsdb league badges', () => {
   });
   test('february maps to y-1..y', () => {
     assert.equal(seasonStringFor('2026-02-10T18:00:00+00:00'), '2025-2026');
+  });
+});
+
+suite('lineups (formations & grid)', () => {
+  const line = (n: number, name: string, grid: string | null, captain = false): any => ({
+    id: n,
+    name,
+    number: n,
+    pos: grid ? 'G' : 'M',
+    photo: '',
+    grid,
+    captain,
+  });
+  const teamL = (id: number, name: string, starters: any[]): any => ({
+    team: { id, name, logo: '' },
+    formation: '4-3-3',
+    coach: { id: 1, name: 'Pep', photo: '' },
+    startingXI: starters,
+    substitutes: [line(88, 'Sub Man', null)],
+    colors: null,
+  });
+
+  test('parses grid coordinates and orders by row/col', () => {
+    const out = toUiLineups(
+      [
+        teamL(50, 'Home', [line(31, 'Ederson', '1:1'), line(3, 'Ruben Dias', '3:2'), line(20, 'Silva', '3:1')]),
+        teamL(42, 'Away', [line(1, 'Alisson', '1:1')]),
+      ],
+      50
+    );
+    assert.equal(out.length, 2);
+    const home = out[0];
+    assert.equal(home.formation, '4-3-3');
+    assert.equal(home.coach, 'Pep');
+    assert.equal(home.starters[0].name, 'Ederson'); // GK row first
+    assert.deepEqual(
+      home.starters.slice(1).map((p) => p.name),
+      ['Silva', 'Ruben Dias']
+    ); // same row → by col
+    assert.deepEqual([home.starters[0].x, home.starters[0].y], [1, 1]);
+    assert.equal(home.bench.length, 1);
+  });
+
+  test('players without grid still render with defaults', () => {
+    const out = toUiLineups([teamL(50, 'Home', [line(9, 'Striker', null, true)])], 50);
+    assert.deepEqual([out[0].starters[0].x, out[0].starters[0].y], [0, 0]);
+    assert.equal(out[0].starters[0].captain, true);
+  });
+});
+
+suite('live edge cases', () => {
+  test('stoppage clock: extra minute surfaces as extraMinute for +N rendering', () => {
+    const f = makeFixture({});
+    f.fixture.status = { long: 'Second Half', short: '2H', elapsed: 92, extra: 92 };
+    const m = toUiMatch(f);
+    assert.equal(m.status.group, 'live');
+    assert.equal(m.status.chip, "92'");
+    assert.equal(m.extraMinute, 92);
+  });
+  test('halftime uses HT chip and pauses ticking', () => {
+    const f = makeFixture({});
+    f.fixture.status = { long: 'Half Time', short: 'HT', elapsed: 45, extra: null };
+    const m = toUiMatch(f);
+    assert.equal(m.status.chip, 'HT');
+    assert.equal(m.status.ticking, false);
+    assert.equal(m.hasStarted, true);
+  });
+  test('suspend then resume code is treated as live-ish (P)', () => {
+    const s = statusInfo('P', 70);
+    assert.equal(s.group, 'live');
   });
 });
 
