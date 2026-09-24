@@ -69,8 +69,34 @@ Workflow:  GitHub repo  ⇄  cloud IDE (CodeSandbox / StackBlitz / Codespaces)  
 | Command | Verifies |
 | --- | --- |
 | `npm run typecheck` | strict TypeScript across the whole app |
-| `npm test` | 20 unit tests for the pure core (clock/status, timeline classifier, stats normalizer, sorting/grouping) |
+| `npm test` | 25 unit tests for the pure core (clock/status, timeline classifier, stats normalizer, sorting/grouping, lineups) |
 | `npx expo export --platform android` | full Metro/Hermes bundle of every screen |
+
+## 📦 Building the APK (two ways)
+
+### A) Local Gradle build (any Linux box with ~4 GB disk, 2 GB RAM — including cloud sandboxes)
+
+```bash
+npm ci
+bash scripts/setup-android-toolchain.sh   # one-time: JDK 17 + Android SDK 36 + NDK (no root)
+npm run android:apk                        # prebuild + sign + assembleRelease
+```
+
+The signed APK lands at `android/app/build/outputs/apk/release/app-arm64-v8a-release.apk`.
+The build script generates a release keystore at `~/tools/goalcreed-release.keystore`
+(**back it up** — Play Store uploads require the same signing key forever; password: `goalcreed`,
+change `KS_PASS` before real publishing). Copy the APK to your phone and tap to install
+(enable *Install unknown apps* for your file manager).
+
+### B) EAS cloud build (works from phone-only, no toolchain at all)
+
+```bash
+npm i -g eas-cli   # or use CodeSandbox terminal
+eas login
+npx eas init       # links the project once
+npx eas build -p android --profile preview   # returns an APK download link
+```
+
 
 ## Incremental GitHub workflow (phone-friendly)
 
