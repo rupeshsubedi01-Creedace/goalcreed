@@ -43,10 +43,11 @@ export type UiMatch = {
   updatedAt: number;
 };
 
-/** "Manchester City" → "M'chester City"? Keep smart short names: strip common noise, else last word. */
+/** Smart short names: strip leading/trailing org noise, else keep last word. */
 export function shortTeamName(name: string): string {
-  const noise = /^(afc|cf|sc|ac|as|ss|fc|if|bk|cd|ud|rc|rcd|ca|racing club|club)\s+/i;
-  const cleaned = name.replace(noise, '').trim();
+  const noiseLead = /^(afc|cf|sc|ac|as|ss|fc|if|bk|cd|ud|rc|rcd|ca|racing club|club)\s+/i;
+  const noiseTrail = /\s+(afc|cf|sc|ac|as|ss|fc|if|bk|cd|ud|rc|rcd|ca)$/i;
+  const cleaned = name.replace(noiseLead, '').replace(noiseTrail, '').trim();
   if (cleaned.length <= 11) return cleaned || name;
   const words = cleaned.split(' ');
   if (words.length >= 2) return words[words.length - 1];

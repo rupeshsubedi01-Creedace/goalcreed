@@ -57,6 +57,14 @@ export function fromApiDate(s: string): Date {
   return new Date(y, m - 1, d);
 }
 
+/** Derive TheSportsDB season string ("2024-2025") from a kickoff ISO date. */
+export function seasonStringFor(kickoffIso: string): string {
+  const d = new Date(kickoffIso);
+  const y = isNaN(d.getTime()) ? new Date().getFullYear() : d.getFullYear();
+  const m = isNaN(d.getTime()) ? new Date().getMonth() : d.getMonth();
+  return m >= 6 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
+}
+
 export function daysAround(today: Date, before: number, after: number): Date[] {
   const out: Date[] = [];
   for (let i = -before; i <= after; i++) {

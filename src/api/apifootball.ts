@@ -59,7 +59,7 @@ export function getFixtureEvents(id: number) {
 }
 
 export function getFixtureStats(id: number) {
-  return af<TeamStatistics[]>('/fixtures/statistics', { fixture: id }, `af.stats.${id}`, 30_000);
+  return af<TeamStatistics>('/fixtures/statistics', { fixture: id }, `af.stats.${id}`, 30_000);
 }
 
 export function getFixtureLineups(id: number) {

@@ -96,7 +96,7 @@ export type TeamLineup = {
   team: TeamRef;
   formation: string | null;
   coach: { id: number; name: string; photo: string } | null;
-  starters: LineupPlayer[];
-  bench: LineupPlayer[];
+  startingXI: LineupPlayer[];
+  substitutes: LineupPlayer[];
   colors: { playerNumber: string; playerMainColor: string; playerBorder: string } | null;
 };
