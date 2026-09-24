@@ -32,7 +32,9 @@
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
+    "@types/node": "^26.6.2",
     "@types/react": "~19.2.2",
+    "esbuild": "^0.28.2",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -41,7 +43,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "test": "esbuild src/__tests__/core.spec.ts --bundle --platform=node --format=cjs --outfile=.tmp-tests/core.spec.cjs --log-level=warning && node .tmp-tests/core.spec.cjs"
   },
   "private": true
 }
