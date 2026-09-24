@@ -97,6 +97,19 @@ npx eas init       # links the project once
 npx eas build -p android --profile preview   # returns an APK download link
 ```
 
+### Shipped v1.0.0 release (built via pipeline A, 24 Sep 2026)
+
+| | |
+| --- | --- |
+| Artifact | `goalcreed-v1.0.0-arm64-release.apk` · 44.2 MB · min SDK 24 (Android 7+) · target SDK 36 |
+| Package | `com.creedace.goalcreed` · versionName 1.0.0 · versionCode 1 |
+| Signing | release key `CN=GoalCreed` (SHA-256 `4fe6ab94…dd50f23`) · keep `goalcreed-release.keystore` safe — password `goalcreed` |
+| APK SHA-256 | `a1d32ac2fa46e256323d269ab992500a9f409b0082e278a5e9de48464333ad93` |
+
+Install: copy the APK to your phone → tap it → allow "install unknown apps" for your
+file manager once. Future releases must keep the same package id **and** keystore to
+update in place (bump `version` + `buildNumber` in `app.json` each time).
+
 
 ## Incremental GitHub workflow (phone-friendly)
 
